@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>تعديل الأسعار - مبيعات يومية</title>
+  <style>
+    body {
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0; padding: 0;
+      background-color: #fff;
+      color: #222;
+      max-width: 600px;
+      margin: 20px auto;
+      padding: 0 20px;
+    }
+    header {
+      background: #b30000;
+      color: white;
+      padding: 10px 20px;
+      text-align: center;
+      position: relative;
+    }
+    h1 {
+      margin: 0;
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    input[type=text], input[type=number] {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      font-size: 16px;
+      box-sizing: border-box;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+    button {
+      margin-top: 20px;
+      background-color: #b30000;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+      width: 100%;
+    }
+    button:hover {
+      background-color: #800000;
+    }
+    ul {
+      margin-top: 30px;
+      padding: 0;
+      list-style: none;
+    }
+    ul li {
+      background: #f4f4f4;
+      margin-bottom: 10px;
+      padding: 10px;
+      border-radius: 5px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    ul li span {
+      font-weight: bold;
+    }
+    ul li button {
+      background: #e74c3c;
+      border: none;
+      color: white;
+      font-weight: bold;
+      border-radius: 3px;
+      cursor: pointer;
+      padding: 5px 10px;
+      margin-left: 10px;
+    }
+    ul li button:hover {
+      background: #c0392b;
+    }
+    #backBtn {
+      position: absolute;
+      top: 10px;
+      right: 20px;
+      background: transparent;
+      border: none;
+      color: white;
+      font-size: 18px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <button id="backBtn" title="رجوع">←</button>
+    <h1>تعديل الأسعار</h1>
+  </header>
+  <main>
+    <label for="newProductName">اسم المنتج الجديد:</label>
+    <input type="text" id="newProductName" placeholder="مثال: عدادات" />
+
+    <label for="newProductPrice">سعر المنتج الجديد:</label>
+    <input type="number" id="newProductPrice" placeholder="مثال: 7500" min="0" />
+
+    <button id="addNewProduct">إضافة / تعديل المنتج</button>
+
+    <ul id="productsList"></ul>
+  </main>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyC-UjeJiOP2-hlD6gAQTKAUL_E_Ns5y0x0",
+  authDomain: "store-64757.firebaseapp.com",
+  projectId: "store-64757",
+  storageBucket: "store-64757.appspot.com",
+  messagingSenderId: "240047001550",
+  appId: "1:240047001550:web:ed9577c48a975d11b7e59f",
+  measurementId: "G-FENZRL8FSF"
+};
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+const newProductName = document.getElementById("newProductName");
+const newProductPrice = document.getElementById("newProductPrice");
+const addNewProductBtn = document.getElementById("addNewProduct");
+const productsList = document.getElementById("productsList");
+const backBtn = document.getElementById("backBtn");
+
+let user = null;
+let prices = {};
+
+function renderPrices() {
+  productsList.innerHTML = "";
+  for (const [name, price] of Object.entries(prices)) {
+    const li = document.createElement("li");
+    li.innerHTML = `<span>${name} : ${price} </span>
+      <button data-product="${name}">حذف</button>`;
+    productsList.appendChild(li);
+  }
+}
+
+async function loadPrices() {
+  if (!user) return;
+  const docRef = doc(db, "users", user.uid);
+  const docSnap = await getDoc(docRef);
+  if (docSnap.exists()) {
+    prices = docSnap.data().prices || {};
+  } else {
+    prices = {};
+  }
+  renderPrices();
+}
+
+async function savePrices() {
+  if (!user) return;
+  const docRef = doc(db, "users", user.uid);
+  await setDoc(docRef, { prices }, { merge: true });
+}
+
+addNewProductBtn.addEventListener("click", async () => {
+  const name = newProductName.value.trim();
+  const price = Number(newProductPrice.value);
+  if (!name) {
+    alert("رجاءً أدخل اسم المنتج");
+    return;
+  }
+  if (isNaN(price) || price < 0) {
+    alert("رجاءً أدخل سعر صحيح للمنتج");
+    return;
+  }
+  prices[name] = price;
+  await savePrices();
+  renderPrices();
+  newProductName.value = "";
+  newProductPrice.value = "";
+});
+
+productsList.addEventListener("click", async (e) => {
+  if (e.target.tagName === "BUTTON") {
+    const product = e.target.getAttribute("data-product");
+    if (product && confirm(`هل تريد حذف المنتج "${product}"؟`)) {
+      delete prices[product];
+      await savePrices();
+      renderPrices();
+    }
+  }
+});
+
+backBtn.addEventListener("click", () => {
+  window.location.href = "index.html";
+});
+
+onAuthStateChanged(auth, (u) => {
+  if (u) {
+    user = u;
+    loadPrices();
+  } else {
+    alert("يرجى تسجيل الدخول أولاً من الصفحة الرئيسية");
+    window.location.href = "index.html";
+  }
+});
+</script>
+</body>
+</html>
