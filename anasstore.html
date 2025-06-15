@@ -1,161 +1,241 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>تسجيل المبيعات اليومية</title>
-<style>
-  body { font-family: Arial, sans-serif; margin: 20px; }
-  input, button, select { padding: 8px; margin: 5px 0; width: 100%; max-width: 300px; }
-  table { width: 100%; max-width: 600px; border-collapse: collapse; margin-top: 20px; }
-  th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
-  th { background-color: #f2f2f2; }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>مبيعات يومية - تسجيل الدخول</title>
+  <style>
+    body {
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0; padding: 0;
+      background-color: #fff;
+      color: #222;
+    }
+    header {
+      background: #b30000;
+      color: white;
+      padding: 10px 20px;
+      position: relative;
+    }
+    .menu {
+      position: absolute;
+      top: 10px;
+      left: 20px;
+      font-size: 30px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .menu-content {
+      display: none;
+      position: absolute;
+      top: 40px;
+      left: 20px;
+      background: #fff;
+      border: 1px solid #ccc;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      z-index: 100;
+      width: 200px;
+      border-radius: 5px;
+    }
+    .menu-content button {
+      width: 100%;
+      padding: 10px;
+      background: none;
+      border: none;
+      border-bottom: 1px solid #eee;
+      cursor: pointer;
+      text-align: right;
+      font-size: 14px;
+    }
+    .menu-content button:last-child {
+      border-bottom: none;
+    }
+    .menu-content button:hover {
+      background: #f4f4f4;
+    }
+    .dark-mode {
+      background-color: #222;
+      color: #eee;
+    }
+    main {
+      max-width: 600px;
+      margin: 20px auto;
+      padding: 0 20px;
+    }
+    .login-btn {
+      background-color: #4285f4;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .login-btn:hover {
+      background-color: #3367d6;
+    }
+    .hidden {
+      display: none;
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    select, input[type=number] {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      font-size: 16px;
+      box-sizing: border-box;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+    button#addSale {
+      margin-top: 20px;
+      background-color: #b30000;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+      width: 100%;
+    }
+    button#addSale:hover {
+      background-color: #800000;
+    }
+    #salesList {
+      margin-top: 30px;
+    }
+    #salesList table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    #salesList th, #salesList td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: center;
+    }
+    #salesList th {
+      background-color: #b30000;
+      color: white;
+    }
+  </style>
 </head>
 <body>
-  <h2>تسجيل المبيعات اليومية</h2>
+  <header>
+    <div class="menu" id="menuBtn">⋮</div>
+    <div class="menu-content" id="menuContent">
+      <button id="toggleDark">تبديل الوضع الداكن</button>
+      <button id="editPricesBtn">تعديل الأسعار</button>
+      <button id="viewPastSalesBtn">عرض المبيعات السابقة</button>
+      <button id="logoutBtn" class="hidden">تسجيل الخروج</button>
+    </div>
+    <h1>مبيعات يومية</h1>
+  </header>
+  <main>
+    <button id="loginGoogle" class="login-btn">تسجيل الدخول بحساب جوجل</button>
 
-  <label>اسم المنتج:</label>
-  <select id="productName">
-    <option value="كولون">كولون (6500)</option>
-    <option value="جرابات وسط">جرابات وسط (2500)</option>
-    <option value="جرابات ثقيل">جرابات ثقيل (3000)</option>
-    <option value="خف">خف (2500)</option>
-    <option value="بوكسر محير">بوكسر محير (6000)</option>
-    <option value="لحمي قصير">لحمي قصير (2500)</option>
-    <option value="لحمي طويل">لحمي طويل (3500)</option>
-    <option value="كشكش">كشكش (3000)</option>
-    <option value="ايميلي">ايميلي (9500)</option>
-    <option value="زنود">زنود (6000)</option>
-    <option value="شيال">شيال (10000)</option>
-    <option value="شيال رياضي">شيال رياضي (11000)</option>
-    <option value="طقم ولادي">طقم ولادي (8000)</option>
-    <option value="بوكسر رجالي">بوكسر رجالي (8300)</option>
-    <option value="بكلة فراشة">بكلة فراشة (5000)</option>
-    <option value="مطاط">مطاط (2000)</option>
-    <option value="عطر">عطر (5000)</option>
-  </select>
+    <div id="appContent" class="hidden">
+      <label for="productSelect">اختر المنتج:</label>
+      <select id="productSelect"></select>
 
-  <label>كمية المبيعات:</label>
-  <input type="number" id="quantity" min="1" value="1" />
+      <label for="quantityInput">الكمية المباعة:</label>
+      <input type="number" id="quantityInput" min="1" value="1" />
 
-  <label>السعر الكلي (للكمية):</label>
-  <input type="number" id="totalPrice" min="1" />
+      <label for="totalPriceInput">السعر الإجمالي (لكامل الكمية):</label>
+      <input type="number" id="totalPriceInput" min="0" />
 
-  <button onclick="addSale()">أضف المبيع</button>
+      <button id="addSale">إضافة بيع</button>
 
-  <h3>مبيعات اليوم (<span id="todayDate"></span>)</h3>
-  <table id="salesTable">
-    <thead>
-      <tr>
-        <th>اسم المنتج</th>
-        <th>الكمية</th>
-        <th>السعر الكلي</th>
-        <th>سعر الوحدة</th>
-        <th>الربح</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+      <div id="salesList">
+        <h3>المبيعات لهذا اليوم</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>المنتج</th>
+              <th>الكمية</th>
+              <th>السعر الإجمالي</th>
+              <th>الربح</th>
+            </tr>
+          </thead>
+          <tbody id="salesTableBody"></tbody>
+        </table>
+        <h4 id="summary"></h4>
+      </div>
+    </div>
+  </main>
 
-  <h3>الإجماليات</h3>
-  <p>إجمالي المبيع: <span id="totalSales">0</span></p>
-  <p>إجمالي الربح: <span id="totalProfit">0</span></p>
+<script type="module">
+// Firebase config و init
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+import { getFirestore, doc, setDoc, getDoc, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
-<script>
-  // أسعار الشراء الأساسية حسب المنتج
-  const basePrices = {
-    "كولون": 6500,
-    "جرابات وسط": 2500,
-    "جرابات ثقيل": 3000,
-    "خف": 2500,
-    "بوكسر محير": 6000,
-    "لحمي قصير": 2500,
-    "لحمي طويل": 3500,
-    "كشكش": 3000,
-    "ايميلي": 9500,
-    "زنود": 6000,
-    "شيال": 10000,
-    "شيال رياضي": 11000,
-    "طقم ولادي": 8000,
-    "بوكسر رجالي": 8300,
-    "بكلة فراشة": 5000,
-    "مطاط": 2000,
-    "عطر": 5000
-  };
+const firebaseConfig = {
+  apiKey: "AIzaSyC-UjeJiOP2-hlD6gAQTKAUL_E_Ns5y0x0",
+  authDomain: "store-64757.firebaseapp.com",
+  projectId: "store-64757",
+  storageBucket: "store-64757.appspot.com",
+  messagingSenderId: "240047001550",
+  appId: "1:240047001550:web:ed9577c48a975d11b7e59f",
+  measurementId: "G-FENZRL8FSF"
+};
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-  const today = new Date().toISOString().slice(0,10);
-  document.getElementById("todayDate").textContent = today;
+const menuBtn = document.getElementById("menuBtn");
+const menuContent = document.getElementById("menuContent");
+const toggleDarkBtn = document.getElementById("toggleDark");
+const editPricesBtn = document.getElementById("editPricesBtn");
+const viewPastSalesBtn = document.getElementById("viewPastSalesBtn");
+const logoutBtn = document.getElementById("logoutBtn");
 
-  // جلب المبيعات من التخزين المحلي (LocalStorage)
-  function loadSales() {
-    let sales = JSON.parse(localStorage.getItem("sales_" + today));
-    if (!sales) sales = [];
-    return sales;
+const loginGoogleBtn = document.getElementById("loginGoogle");
+const appContent = document.getElementById("appContent");
+const productSelect = document.getElementById("productSelect");
+const quantityInput = document.getElementById("quantityInput");
+const totalPriceInput = document.getElementById("totalPriceInput");
+const addSaleBtn = document.getElementById("addSale");
+const salesTableBody = document.getElementById("salesTableBody");
+const summary = document.getElementById("summary");
+
+let user = null;
+let prices = {
+  "كولون": 6500,
+  "جرابات وسط": 2500,
+  "جرابات ثقيل": 3000,
+  "خف": 2500,
+  "بوكسر محير": 6000,
+  "لحمي قصير": 2500,
+  "لحمي طويل": 3500,
+  "كشكش": 3000,
+  "ايميلي": 9500,
+  "زنود": 6000,
+  "شيال": 10000,
+  "شيال رياضي": 11000,
+  "طقم ولادي": 8000,
+  "بوكسر رجالي": 8300,
+  "بكلة فراشة": 5000,
+  "مطاط": 2000,
+  "عطر": 5000,
+  "عدادات": 7500
+};
+let sales = [];
+
+function fillProducts() {
+  productSelect.innerHTML = "";
+  for (const p in prices) {
+    const option = document.createElement("option");
+    option.value = p;
+    option.textContent = p;
+    productSelect.appendChild(option);
   }
+}
 
-  // حفظ المبيعات في التخزين المحلي
-  function saveSales(sales) {
-    localStorage.setItem("sales_" + today, JSON.stringify(sales));
-  }
-
-  // تحديث عرض المبيعات في الجدول
-  function displaySales() {
-    const sales = loadSales();
-    const tbody = document.querySelector("#salesTable tbody");
-    tbody.innerHTML = "";
-
-    let totalSales = 0;
-    let totalProfit = 0;
-
-    sales.forEach(sale => {
-      const unitPrice = sale.totalPrice / sale.quantity;
-      const profitPerUnit = unitPrice - basePrices[sale.product];
-      const profit = profitPerUnit * sale.quantity;
-
-      totalSales += sale.totalPrice;
-      totalProfit += profit;
-
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td>${sale.product}</td>
-        <td>${sale.quantity}</td>
-        <td>${sale.totalPrice.toLocaleString()}</td>
-        <td>${unitPrice.toFixed(2)}</td>
-        <td>${profit.toLocaleString()}</td>
-      `;
-      tbody.appendChild(tr);
-    });
-
-    document.getElementById("totalSales").textContent = totalSales.toLocaleString();
-    document.getElementById("totalProfit").textContent = totalProfit.toLocaleString();
-  }
-
-  // إضافة بيع جديد
-  function addSale() {
-    const product = document.getElementById("productName").value;
-    const quantity = parseInt(document.getElementById("quantity").value);
-    const totalPrice = parseFloat(document.getElementById("totalPrice").value);
-
-    if (!product || !quantity || !totalPrice) {
-      alert("الرجاء تعبئة جميع الحقول بشكل صحيح.");
-      return;
-    }
-
-    let sales = loadSales();
-
-    sales.push({ product, quantity, totalPrice });
-
-    saveSales(sales);
-    displaySales();
-
-    // تنظيف الحقول
-    document.getElementById("quantity").value = 1;
-    document.getElementById("totalPrice").value = "";
-  }
-
-  // تحميل المبيعات عند فتح الصفحة
-  window.onload = displaySales;
-</script>
-</body>
-</html>
+function renderSales() {
+  salesTableBody.innerHTML = "";
+  let totalProfit = 0;
+  let totalSales = 0
